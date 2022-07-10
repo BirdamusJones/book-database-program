@@ -25,11 +25,7 @@ def menu():
             \rA number from 1-5
             \rPress enter to try again''')
 
-# def edit_books():
-# edit books - function
-# def delete_books(self):
-# def search_books():
-# # search books - function
+
 
 #  data cleaning
 def clean_date(date_str):
@@ -93,8 +89,7 @@ def app():
     app_running = True
     while app_running:
         choice = menu()
-        if choice == '1':
-            # add book
+        if choice == '1':  # add book
             title = input('Title:  ')
             author = input('Author:  ')
             date_error = True
@@ -113,10 +108,11 @@ def app():
             session.add(new_book)
             session.commit()  
             print('Book Added!')
-            time.sleep(5)      
-        elif choice == '2':
-            #view books
-            pass
+            time.sleep(1.5)      
+        elif choice == '2': #view books
+            for book in session.query(Book):
+                print(f'{book.id} | {book.title} | {book.author}')
+            input('\nPress enter to return to the main menu')
         elif choice == '3':
             #search book
             pass
