@@ -6,8 +6,7 @@ import time
 
 
 
-# main menu - add, search, analysis, exit, view - class?
-def menu():
+def menu(): # main menu - add, search, analysis, exit, view 
     while True:
         print('''
               \nPROGRAMMING BOOKS 
@@ -27,8 +26,7 @@ def menu():
 
 
 
-#  data cleaning
-def clean_date(date_str):
+def clean_date(date_str): # clean date
     months = ['January', 'February', 'March', 'April', 'May', 'June', 
               'July', 'August', 'September', 'October', 'November', 'December']
     split_date = date_str.split(' ')
@@ -56,7 +54,7 @@ def clean_date(date_str):
     else:
         return return_date 
 
-def clean_price(price_str):
+def clean_price(price_str): # clean price
     try:
         price_float = float(price_str)
     except ValueError:
@@ -69,8 +67,31 @@ def clean_price(price_str):
         return
     else:
         return int(price_float * 100)
-    
-def add_csv():
+
+def clean_id(id_str, options): # clean id
+    try:
+        book_id = int(id_str)
+    except ValueError:
+        input('''
+              \n****** ID ERROR ******
+              \rThe id should be a number.
+              \rPress enter to try again.
+              \r*************************''')
+        return
+    else:
+        if book_id in options:
+            return book_id
+        else:
+            input(f'''
+              \n****** ID ERROR ******
+              \rOptions: {options}
+              \rPress enter to try again.
+              \r*************************''')
+            return
+
+
+
+def add_csv(): # reads / loads csv to db
     with open('suggested_books.csv') as csvfile:
         data = csv.reader(csvfile)
         for row in data:
@@ -84,8 +105,8 @@ def add_csv():
                 session.add(new_book)
         session.commit()
 
-#  loop runs program
-def app():
+
+def app(): #  loop runs program
     app_running = True
     while app_running:
         choice = menu()
@@ -113,11 +134,24 @@ def app():
             for book in session.query(Book):
                 print(f'{book.id} | {book.title} | {book.author}')
             input('\nPress enter to return to the main menu')
-        elif choice == '3':
-            #search book
-            pass
-        elif choice == '4':
-            #analysis
+        elif choice == '3': #search book
+            id_options = []
+            for book in session.query(Book):
+                id_options.append(book.id)
+            id_error = True
+            while id_error:
+                id_choice = input(f'''
+                    \nId Options: {id_options}
+                    \rBook id: ''')    
+                id_choice = clean_id(id_choice, id_options)
+                if type(id_choice) == int:
+                    id_error = False
+            the_book = session.query(Book).filter(Book.id==id_choice)      
+            print(f'''
+                  \n{the_book.title} by {the_book.author}
+                  \rPublished: {the_book.date_published}
+                  \rPrice: ${the_book.price / 100}''')       
+        elif choice == '4': # analysis
             pass
         else:
             print('GOODBYE')
@@ -129,5 +163,3 @@ if __name__ == '__main__':
     add_csv()
     app()
 
-for book in session.query(Book):
-    print(book)
